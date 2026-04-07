@@ -17,21 +17,20 @@ namespace VgcCollege.Web.Controllers
             _context = context;
         }
 
-        // LIST
+     
         public async Task<IActionResult> Index()
         {
             var data = _context.Assignments.Include(a => a.Course);
             return View(await data.ToListAsync());
         }
 
-        // CREATE (GET)
+        
         public IActionResult Create()
         {
             ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Name");
             return View();
         }
 
-        // CREATE (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Assignment assignment)
@@ -47,7 +46,7 @@ namespace VgcCollege.Web.Controllers
             return View(assignment);
         }
 
-        // EDIT (GET)
+        
         public async Task<IActionResult> Edit(int id)
         {
             var assignment = await _context.Assignments.FindAsync(id);
@@ -57,7 +56,7 @@ namespace VgcCollege.Web.Controllers
             return View(assignment);
         }
 
-        // EDIT (POST)
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Assignment assignment)
@@ -75,7 +74,7 @@ namespace VgcCollege.Web.Controllers
             return View(assignment);
         }
 
-        // DELETE (GET)
+       
         public async Task<IActionResult> Delete(int id)
         {
             var assignment = await _context.Assignments
@@ -87,7 +86,7 @@ namespace VgcCollege.Web.Controllers
             return View(assignment);
         }
 
-        // DELETE (POST)
+        
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

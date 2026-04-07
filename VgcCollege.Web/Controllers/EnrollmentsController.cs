@@ -11,7 +11,7 @@ using VgcCollege.Web.Models;
 
 namespace VgcCollege.Web.Controllers
 {
-    [Authorize(Roles = "Admin,Faculty")] // 🔒 PROTEÇÃO
+    [Authorize(Roles = "Admin,Faculty")] 
     public class EnrollmentsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -21,7 +21,7 @@ namespace VgcCollege.Web.Controllers
             _context = context;
         }
 
-        // ✅ LIST
+       
         public async Task<IActionResult> Index()
         {
             var enrollments = _context.CourseEnrollments
@@ -31,7 +31,7 @@ namespace VgcCollege.Web.Controllers
             return View(await enrollments.ToListAsync());
         }
 
-        // ✅ DETAILS
+        
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -46,14 +46,14 @@ namespace VgcCollege.Web.Controllers
             return View(enrollment);
         }
 
-        // ✅ GET CREATE
+        
         public IActionResult Create()
         {
             LoadDropdowns();
             return View();
         }
 
-        // ✅ POST CREATE
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,StudentProfileId,CourseId")] CourseEnrollment enrollment)
@@ -69,7 +69,7 @@ namespace VgcCollege.Web.Controllers
             return View(enrollment);
         }
 
-        // ✅ GET EDIT
+       
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -81,7 +81,6 @@ namespace VgcCollege.Web.Controllers
             return View(enrollment);
         }
 
-        // ✅ POST EDIT
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,StudentProfileId,CourseId")] CourseEnrollment enrollment)
@@ -110,7 +109,7 @@ namespace VgcCollege.Web.Controllers
             return View(enrollment);
         }
 
-        // ✅ GET DELETE
+       
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -125,7 +124,7 @@ namespace VgcCollege.Web.Controllers
             return View(enrollment);
         }
 
-        // ✅ POST DELETE (🔒 só Admin)
+        
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
@@ -142,7 +141,7 @@ namespace VgcCollege.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ✅ MÉTODO AUXILIAR (clean code)
+       
         private void LoadDropdowns(CourseEnrollment? enrollment = null)
         {
             ViewData["CourseId"] = new SelectList(

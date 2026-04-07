@@ -20,7 +20,7 @@ namespace VgcCollege.Web.Data
         public DbSet<Exam> Exams { get; set; }
         public DbSet<ExamResult> ExamResults { get; set; }
 
-        // 🔥 ADICIONAR (erro seu)
+        
         public DbSet<AttendanceRecord> AttendanceRecords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)

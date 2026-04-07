@@ -21,7 +21,7 @@ namespace VgcCollege.Web.Controllers
             _context = context;
         }
 
-        // 🔒 ADMIN / FACULTY
+       
         [Authorize(Roles = "Admin,Faculty")]
         public async Task<IActionResult> Index()
         {
@@ -33,7 +33,7 @@ namespace VgcCollege.Web.Controllers
             return View(exams);
         }
 
-        // 👨‍🎓 STUDENT
+      
         [Authorize(Roles = "Student")]
         public async Task<IActionResult> MyExams()
         {
@@ -52,7 +52,7 @@ namespace VgcCollege.Web.Controllers
             return View("Index", exams);
         }
 
-        // 🔓 TODOS LOGADOS
+        
         [Authorize(Roles = "Admin,Faculty,Student")]
         public async Task<IActionResult> Details(int? id)
         {
@@ -68,7 +68,7 @@ namespace VgcCollege.Web.Controllers
             return View(exam);
         }
 
-        // 🔒 ADMIN / FACULTY
+        
         [Authorize(Roles = "Admin,Faculty")]
         public IActionResult Create()
         {
@@ -92,7 +92,7 @@ namespace VgcCollege.Web.Controllers
             return View(exam);
         }
 
-        // 🔒 ADMIN / FACULTY
+        
         [Authorize(Roles = "Admin,Faculty")]
         public async Task<IActionResult> Edit(int? id)
         {
@@ -134,7 +134,7 @@ namespace VgcCollege.Web.Controllers
             return View(exam);
         }
 
-        // 🔒 ADMIN / FACULTY
+       
         [Authorize(Roles = "Admin,Faculty")]
         public async Task<IActionResult> Delete(int? id)
         {
@@ -150,7 +150,7 @@ namespace VgcCollege.Web.Controllers
             return View(exam);
         }
 
-        // 🔒 SÓ ADMIN
+        
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
