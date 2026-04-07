@@ -5,7 +5,7 @@ using VgcCollege.Web.Data;
 
 namespace VgcCollege.Web.Controllers
 {
-    [Authorize(Roles = "Admin,Faculty,Student")]
+    [Authorize]
     public class GradebookController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -15,35 +15,14 @@ namespace VgcCollege.Web.Controllers
             _context = context;
         }
 
-        // ✅ VIEW GERAL (Admin / Faculty)
-        [Authorize(Roles = "Admin,Faculty")]
         public async Task<IActionResult> Index()
         {
-            var data = await _context.AssignmentResults
-                .Include(a => a.StudentProfile)
-                .Include(a => a.Assignment)
-                    .ThenInclude(a => a.Course)
-                .AsNoTracking()
+            var students = await _context.StudentProfiles
+                .Include(s => s.AssignmentResults)
+                .Include(s => s.ExamResults)
                 .ToListAsync();
 
-            return View(data);
-        }
-
-        // ✅ VIEW DO PRÓPRIO ALUNO
-        [Authorize(Roles = "Student")]
-        public async Task<IActionResult> MyGrades()
-        {
-            var userId = User?.Identity?.Name;
-
-            var data = await _context.AssignmentResults
-                .Include(a => a.StudentProfile)
-                .Include(a => a.Assignment)
-                    .ThenInclude(a => a.Course)
-                .Where(a => a.StudentProfile.IdentityUserId == userId)
-                .AsNoTracking()
-                .ToListAsync();
-
-            return View("Index", data); // reutiliza mesma view
+            return View(students);
         }
     }
 }

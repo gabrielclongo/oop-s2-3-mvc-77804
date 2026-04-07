@@ -1,0 +1,31 @@
+﻿@model VgcCollege.Web.Models.AssignmentResult
+
+<h2>Add Assignment Result</h2>
+
+<form asp-action="Create">
+
+    <div class="form-group">
+        <label>Student</label>
+        <select asp-for="StudentProfileId"
+                asp-items="ViewBag.StudentProfileId"
+                class="form-control"></select>
+    </div>
+
+    <div class="form-group mt-2">
+        <label>Assignment</label>
+        <select asp-for="AssignmentId"
+                asp-items="ViewBag.AssignmentId"
+                class="form-control"></select>
+    </div>
+
+    <div class="form-group mt-2">
+        <input asp-for="Score" class="form-control" placeholder="Score" />
+    </div>
+
+    <div class="form-group mt-2">
+        <input asp-for="Feedback" class="form-control" placeholder="Feedback" />
+    </div>
+
+    <button type="submit" class="btn btn-success mt-3">Save</button>
+
+</form>

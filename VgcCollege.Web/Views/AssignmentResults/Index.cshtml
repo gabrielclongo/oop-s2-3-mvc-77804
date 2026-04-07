@@ -1,6 +1,6 @@
-﻿@model IEnumerable<VgcCollege.Web.Models.ExamResult>
+﻿@model IEnumerable<VgcCollege.Web.Models.AssignmentResult>
 
-<h2>Exam Results</h2>
+<h2>Assignment Results</h2>
 
 <a asp-action="Create" class="btn btn-success mb-3">+ Add Result</a>
 
@@ -8,7 +8,7 @@
     <thead class="table-dark">
         <tr>
             <th>Student</th>
-            <th>Exam</th>
+            <th>Assignment</th>
             <th>Score</th>
             <th>Feedback</th>
             <th>Actions</th>
@@ -20,7 +20,7 @@
         {
             <tr>
                 <td>@item.StudentProfile?.Name</td>
-                <td>@item.Exam?.Title</td>
+                <td>@item.Assignment?.Title</td>
                 <td>@item.Score</td>
                 <td>@item.Feedback</td>
                 <td>

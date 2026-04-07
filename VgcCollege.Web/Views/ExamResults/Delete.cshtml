@@ -1,0 +1,15 @@
+﻿@model VgcCollege.Web.Models.ExamResult
+
+<h2>Delete Exam Result</h2>
+
+<p>Are you sure?</p>
+
+<div>
+    <strong>@Model.StudentProfile?.Name</strong> -
+    @Model.Exam?.Title
+</div>
+
+<form asp-action="Delete">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit">Delete</button>
+</form>

@@ -131,11 +131,11 @@ namespace VgcCollege.Web.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var enrollment = await _context.CourseEnrollments.FindAsync(id);
+            var course = await _context.Courses.FindAsync(id);
 
-            if (enrollment != null)
+            if (course != null)
             {
-                _context.CourseEnrollments.Remove(enrollment);
+                _context.Courses.Remove(course);
                 await _context.SaveChangesAsync();
             }
 
@@ -153,7 +153,7 @@ namespace VgcCollege.Web.Controllers
             );
 
             ViewData["StudentProfileId"] = new SelectList(
-                _context.Students,
+                _context.StudentProfiles,
                 "Id",
                 "Name",
                 enrollment?.StudentProfileId

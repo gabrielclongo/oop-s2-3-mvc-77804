@@ -1,0 +1,17 @@
+﻿@model VgcCollege.Web.Models.ExamResult
+
+<h2>Add Exam Result</h2>
+
+<form asp-action="Create">
+
+    <select asp-for="StudentProfileId" asp-items="ViewBag.StudentProfileId" class="form-control"></select>
+
+    <select asp-for="ExamId" asp-items="ViewBag.ExamId" class="form-control mt-2"></select>
+
+    <input asp-for="Score" class="form-control mt-2" placeholder="Score" />
+
+    <input asp-for="Feedback" class="form-control mt-2" placeholder="Feedback" />
+
+    <button class="btn btn-success mt-3">Save</button>
+
+</form>

@@ -156,11 +156,11 @@ namespace VgcCollege.Web.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var exam = await _context.Exams.FindAsync(id);
+            var course = await _context.Courses.FindAsync(id);
 
-            if (exam != null)
+            if (course != null)
             {
-                _context.Exams.Remove(exam);
+                _context.Courses.Remove(course);
                 await _context.SaveChangesAsync();
             }
 

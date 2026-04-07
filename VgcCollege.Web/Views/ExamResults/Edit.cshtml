@@ -1,0 +1,30 @@
+﻿@model VgcCollege.Web.Models.ExamResult
+
+<h2 class="mb-4">Edit Exam Result</h2>
+
+<form asp-action="Edit">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group mb-3">
+        <label asp-for="StudentProfileId" class="form-label">Student</label>
+        <select asp-for="StudentProfileId" asp-items="ViewBag.StudentProfileId" class="form-control"></select>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="ExamId" class="form-label">Exam</label>
+        <select asp-for="ExamId" asp-items="ViewBag.ExamId" class="form-control"></select>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Score" class="form-label"></label>
+        <input asp-for="Score" class="form-control" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Feedback" class="form-label"></label>
+        <input asp-for="Feedback" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+</form>

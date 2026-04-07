@@ -1,0 +1,45 @@
+﻿@model IEnumerable<VgcCollege.Web.Models.AssignmentResult>
+
+<h2>My Grades</h2>
+
+<h4>Assignments</h4>
+<table class="table table-dark">
+    <thead>
+        <tr>
+            <th>Course</th>
+            <th>Assignment</th>
+            <th>Score</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Assignment?.Course?.Name</td>
+                <td>@item.Assignment?.Title</td>
+                <td>@item.Score</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h4 class="mt-4">Exams</h4>
+<table class="table table-dark">
+    <thead>
+        <tr>
+            <th>Course</th>
+            <th>Exam</th>
+            <th>Score</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var exam in ViewBag.Exams)
+        {
+            <tr>
+                <td>@exam.Exam?.Course?.Name</td>
+                <td>@exam.Exam?.Title</td>
+                <td>@exam.Score</td>
+            </tr>
+        }
+    </tbody>
+</table>

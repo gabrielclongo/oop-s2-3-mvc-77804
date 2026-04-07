@@ -7,11 +7,11 @@ using VgcCollege.Web.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+// DATABASE
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
+// IDENTITY
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
@@ -19,52 +19,54 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
+// COOKIE (LOGIN FIX)
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Identity/Account/Login";
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+});
 
+// 🔒 GLOBAL AUTH
 builder.Services.AddControllersWithViews(options =>
 {
     var policy = new AuthorizationPolicyBuilder()
         .RequireAuthenticatedUser()
         .Build();
 
-    options.Filters.Add(new AuthorizeFilter(policy)); 
+    options.Filters.Add(new AuthorizeFilter(policy));
 });
 
-builder.Services.AddRazorPages();
+// 🔓 LIBERA LOGIN
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/Login");
+    options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/Register");
+});
 
 var app = builder.Build();
 
-
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-}
-
+// MIDDLEWARE
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication();
+app.UseAuthentication(); // ordem correta
 app.UseAuthorization();
 
-
+// ROUTES
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
 
-
+// SEED USERS
 using (var scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-    var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
-    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-    var context = services.GetRequiredService<ApplicationDbContext>();
-
-   
     string[] roles = { "Admin", "Faculty", "Student" };
 
     foreach (var role in roles)
@@ -73,70 +75,29 @@ using (var scope = app.Services.CreateScope())
             await roleManager.CreateAsync(new IdentityRole(role));
     }
 
-    // ================= ADMIN =================
-    var adminEmail = "admin@test.com";
-    var admin = await userManager.FindByEmailAsync(adminEmail);
-
-    if (admin == null)
+    async Task CreateUser(string email, string password, string role)
     {
-        admin = new IdentityUser
+        var user = await userManager.FindByEmailAsync(email);
+
+        if (user == null)
         {
-            UserName = adminEmail,
-            Email = adminEmail,
-            EmailConfirmed = true
-        };
+            user = new IdentityUser
+            {
+                UserName = email,
+                Email = email,
+                EmailConfirmed = true
+            };
 
-        var result = await userManager.CreateAsync(admin, "Admin123!");
-        if (result.Succeeded)
-            await userManager.AddToRoleAsync(admin, "Admin");
+            var result = await userManager.CreateAsync(user, password);
+
+            if (result.Succeeded)
+                await userManager.AddToRoleAsync(user, role);
+        }
     }
 
-   
-    var studentEmail = "student@test.com";
-    var student = await userManager.FindByEmailAsync(studentEmail);
-
-    if (student == null)
-    {
-        student = new IdentityUser
-        {
-            UserName = studentEmail,
-            Email = studentEmail,
-            EmailConfirmed = true
-        };
-
-        var result = await userManager.CreateAsync(student, "Student123!");
-        if (result.Succeeded)
-            await userManager.AddToRoleAsync(student, "Student");
-    }
-
-   
-    var facultyEmail = "faculty@test.com";
-    var faculty = await userManager.FindByEmailAsync(facultyEmail);
-
-    if (faculty == null)
-    {
-        faculty = new IdentityUser
-        {
-            UserName = facultyEmail,
-            Email = facultyEmail,
-            EmailConfirmed = true
-        };
-
-        var result = await userManager.CreateAsync(faculty, "Faculty123!");
-        if (result.Succeeded)
-            await userManager.AddToRoleAsync(faculty, "Faculty");
-    }
-
-    
-    if (!context.Branches.Any())
-    {
-        context.Branches.AddRange(
-            new Branch { Name = "Main Campus", Address = "Dublin" },
-            new Branch { Name = "North Campus", Address = "Cork" }
-        );
-
-        context.SaveChanges();
-    }
+    await CreateUser("admin@test.com", "Admin123!", "Admin");
+    await CreateUser("student@test.com", "Student123!", "Student");
+    await CreateUser("faculty@test.com", "Faculty123!", "Faculty");
 }
 
 app.Run();

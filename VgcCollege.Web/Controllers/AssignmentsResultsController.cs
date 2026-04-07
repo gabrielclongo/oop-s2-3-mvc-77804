@@ -1,14 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 using VgcCollege.Web.Data;
 using VgcCollege.Web.Models;
 
 namespace VgcCollege.Web.Controllers
 {
-    [Authorize(Roles = "Admin,Faculty,Student")]
+    [Authorize]
     public class AssignmentResultsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -18,75 +17,78 @@ namespace VgcCollege.Web.Controllers
             _context = context;
         }
 
-        // 📊 GRADEBOOK (Assignments)
         public async Task<IActionResult> Index()
         {
-            IQueryable<AssignmentResult> results = _context.AssignmentResults
-                .Include(r => r.StudentProfile)
-                .Include(r => r.Assignment)
-                .ThenInclude(a => a.Course);
+            var data = _context.AssignmentResults
+                .Include(a => a.StudentProfile)
+                .Include(a => a.Assignment);
 
-            // 🔐 STUDENT → só vê os próprios
-            if (User.IsInRole("Student"))
-            {
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-                var student = await _context.Students
-                    .FirstOrDefaultAsync(s => s.IdentityUserId == userId);
-
-                if (student != null)
-                {
-                    results = results.Where(r => r.StudentProfileId == student.Id);
-                }
-            }
-
-            return View(await results.ToListAsync());
+            return View(await data.ToListAsync());
         }
 
-        // ➕ CREATE (Admin + Faculty)
-        [Authorize(Roles = "Admin,Faculty")]
         public IActionResult Create()
         {
-            ViewBag.Students = new SelectList(_context.Students, "Id", "Name");
-            ViewBag.Assignments = new SelectList(_context.Assignments, "Id", "Title");
-
+            ViewData["StudentProfileId"] = new SelectList(_context.StudentProfiles, "Id", "Name");
+            ViewData["AssignmentId"] = new SelectList(_context.Assignments, "Id", "Title");
             return View();
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin,Faculty")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(AssignmentResult result)
         {
             if (ModelState.IsValid)
             {
-                _context.AssignmentResults.Add(result);
+                _context.Add(result);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewBag.Students = new SelectList(_context.Students, "Id", "Name", result.StudentProfileId);
-            ViewBag.Assignments = new SelectList(_context.Assignments, "Id", "Title", result.AssignmentId);
+            ViewData["StudentProfileId"] = new SelectList(_context.StudentProfiles, "Id", "Name", result.StudentProfileId);
+            ViewData["AssignmentId"] = new SelectList(_context.Assignments, "Id", "Title", result.AssignmentId);
+            return View(result);
+        }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            var result = await _context.AssignmentResults.FindAsync(id);
+            if (result == null) return NotFound();
+
+            ViewData["StudentProfileId"] = new SelectList(_context.StudentProfiles, "Id", "Name", result.StudentProfileId);
+            ViewData["AssignmentId"] = new SelectList(_context.Assignments, "Id", "Title", result.AssignmentId);
 
             return View(result);
         }
 
-        // ❌ DELETE
-        [Authorize(Roles = "Admin,Faculty")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, AssignmentResult result)
+        {
+            if (id != result.Id) return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                _context.Update(result);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(result);
+        }
+
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _context.AssignmentResults
-                .Include(r => r.StudentProfile)
-                .Include(r => r.Assignment)
-                .FirstOrDefaultAsync(r => r.Id == id);
+                .Include(a => a.StudentProfile)
+                .Include(a => a.Assignment)
+                .FirstOrDefaultAsync(a => a.Id == id);
 
-            if (result == null)
-                return NotFound();
+            if (result == null) return NotFound();
 
             return View(result);
         }
 
         [HttpPost, ActionName("Delete")]
-        [Authorize(Roles = "Admin,Faculty")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var result = await _context.AssignmentResults.FindAsync(id);

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace VgcCollege.Web.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialClean : Migration
+    public partial class AddResults : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -197,8 +197,14 @@ namespace VgcCollege.Web.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    IdentityUserId = table.Column<string>(type: "TEXT", nullable: false),
+                    IdentityUserId1 = table.Column<string>(type: "TEXT", nullable: true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
-                    IdentityUserId = table.Column<string>(type: "TEXT", nullable: false)
+                    Email = table.Column<string>(type: "TEXT", nullable: true),
+                    Phone = table.Column<string>(type: "TEXT", nullable: true),
+                    Address = table.Column<string>(type: "TEXT", nullable: true),
+                    DOB = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    StudentNumber = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -209,6 +215,11 @@ namespace VgcCollege.Web.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Students_AspNetUsers_IdentityUserId1",
+                        column: x => x.IdentityUserId1,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -332,7 +343,7 @@ namespace VgcCollege.Web.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     AssignmentId = table.Column<int>(type: "INTEGER", nullable: false),
                     StudentProfileId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Grade = table.Column<double>(type: "REAL", nullable: false),
+                    Score = table.Column<double>(type: "REAL", nullable: false),
                     Feedback = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
@@ -381,7 +392,7 @@ namespace VgcCollege.Web.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     ExamId = table.Column<int>(type: "INTEGER", nullable: false),
                     StudentProfileId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Score = table.Column<int>(type: "INTEGER", nullable: false),
+                    Score = table.Column<double>(type: "REAL", nullable: false),
                     Grade = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
@@ -512,6 +523,11 @@ namespace VgcCollege.Web.Migrations
                 name: "IX_Students_IdentityUserId",
                 table: "Students",
                 column: "IdentityUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Students_IdentityUserId1",
+                table: "Students",
+                column: "IdentityUserId1");
         }
 
         /// <inheritdoc />

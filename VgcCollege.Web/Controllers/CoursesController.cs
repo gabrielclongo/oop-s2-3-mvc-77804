@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using VgcCollege.Web.Data;
 using VgcCollege.Web.Models;
 
 namespace VgcCollege.Web.Controllers
 {
-    [Authorize(Roles = "Admin,Faculty")]
+    [Authorize]
     public class CoursesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -17,23 +16,16 @@ namespace VgcCollege.Web.Controllers
             _context = context;
         }
 
-        // ✅ LIST
         public async Task<IActionResult> Index()
         {
-            var courses = _context.Courses
-                .Include(c => c.Branch);
-
-            return View(await courses.ToListAsync());
+            return View(await _context.Courses.ToListAsync());
         }
 
-        // ✅ GET CREATE
         public IActionResult Create()
         {
-            LoadBranches();
             return View();
         }
 
-        // ✅ POST CREATE
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Course course)
@@ -44,22 +36,50 @@ namespace VgcCollege.Web.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-
-            LoadBranches(course);
             return View(course);
         }
 
-
-
-        // 🔥 MÉTODO AUXILIAR (IMPORTANTE)
-        private void LoadBranches(Course? course = null)
+        public async Task<IActionResult> Edit(int id)
         {
-            ViewData["BranchId"] = new SelectList(
-                _context.Branches,
-                "Id",
-                "Name",
-                course?.BranchId
-            );
+            var course = await _context.Courses.FindAsync(id);
+            if (course == null) return NotFound();
+            return View(course);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Course course)
+        {
+            if (id != course.Id) return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                _context.Update(course);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(course);
+        }
+
+        public async Task<IActionResult> Delete(int id)
+        {
+            var course = await _context.Courses.FindAsync(id);
+            if (course == null) return NotFound();
+            return View(course);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var course = await _context.Courses.FindAsync(id);
+
+            if (course != null)
+            {
+                _context.Courses.Remove(course);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

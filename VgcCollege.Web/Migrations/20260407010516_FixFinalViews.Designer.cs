@@ -11,8 +11,8 @@ using VgcCollege.Web.Data;
 namespace VgcCollege.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260406214912_UpdateStudentProfile")]
-    partial class UpdateStudentProfile
+    [Migration("20260407010516_FixFinalViews")]
+    partial class FixFinalViews
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -225,9 +225,6 @@ namespace VgcCollege.Web.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("CourseId1")
-                        .HasColumnType("INTEGER");
-
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("TEXT");
 
@@ -240,8 +237,6 @@ namespace VgcCollege.Web.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId");
-
-                    b.HasIndex("CourseId1");
 
                     b.ToTable("Assignments");
                 });
@@ -258,7 +253,7 @@ namespace VgcCollege.Web.Migrations
                     b.Property<string>("Feedback")
                         .HasColumnType("TEXT");
 
-                    b.Property<double>("Grade")
+                    b.Property<double>("Score")
                         .HasColumnType("REAL");
 
                     b.Property<int>("StudentProfileId")
@@ -309,7 +304,7 @@ namespace VgcCollege.Web.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Branches");
+                    b.ToTable("Branch");
                 });
 
             modelBuilder.Entity("VgcCollege.Web.Models.Course", b =>
@@ -346,9 +341,6 @@ namespace VgcCollege.Web.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("CourseId1")
-                        .HasColumnType("INTEGER");
-
                     b.Property<DateTime>("EnrolDate")
                         .HasColumnType("TEXT");
 
@@ -362,8 +354,6 @@ namespace VgcCollege.Web.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.HasIndex("CourseId1");
-
                     b.HasIndex("StudentProfileId");
 
                     b.ToTable("CourseEnrollments");
@@ -376,9 +366,6 @@ namespace VgcCollege.Web.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("CourseId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("CourseId1")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("Date")
@@ -397,8 +384,6 @@ namespace VgcCollege.Web.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.HasIndex("CourseId1");
-
                     b.ToTable("Exams");
                 });
 
@@ -411,11 +396,14 @@ namespace VgcCollege.Web.Migrations
                     b.Property<int>("ExamId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Feedback")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Grade")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Score")
-                        .HasColumnType("INTEGER");
+                    b.Property<double>("Score")
+                        .HasColumnType("REAL");
 
                     b.Property<int>("StudentProfileId")
                         .HasColumnType("INTEGER");
@@ -427,31 +415,6 @@ namespace VgcCollege.Web.Migrations
                     b.HasIndex("StudentProfileId");
 
                     b.ToTable("ExamResults");
-                });
-
-            modelBuilder.Entity("VgcCollege.Web.Models.FacultyProfile", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("IdentityUserId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Phone")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdentityUserId");
-
-                    b.ToTable("FacultyProfiles");
                 });
 
             modelBuilder.Entity("VgcCollege.Web.Models.StudentProfile", b =>
@@ -470,10 +433,6 @@ namespace VgcCollege.Web.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("IdentityUserId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("IdentityUserId1")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
@@ -490,9 +449,7 @@ namespace VgcCollege.Web.Migrations
 
                     b.HasIndex("IdentityUserId");
 
-                    b.HasIndex("IdentityUserId1");
-
-                    b.ToTable("Students");
+                    b.ToTable("StudentProfiles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -549,14 +506,10 @@ namespace VgcCollege.Web.Migrations
             modelBuilder.Entity("VgcCollege.Web.Models.Assignment", b =>
                 {
                     b.HasOne("VgcCollege.Web.Models.Course", "Course")
-                        .WithMany()
+                        .WithMany("Assignments")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("VgcCollege.Web.Models.Course", null)
-                        .WithMany("Assignments")
-                        .HasForeignKey("CourseId1");
 
                     b.Navigation("Course");
                 });
@@ -570,9 +523,9 @@ namespace VgcCollege.Web.Migrations
                         .IsRequired();
 
                     b.HasOne("VgcCollege.Web.Models.StudentProfile", "StudentProfile")
-                        .WithMany()
+                        .WithMany("AssignmentResults")
                         .HasForeignKey("StudentProfileId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Assignment");
@@ -605,14 +558,10 @@ namespace VgcCollege.Web.Migrations
             modelBuilder.Entity("VgcCollege.Web.Models.CourseEnrollment", b =>
                 {
                     b.HasOne("VgcCollege.Web.Models.Course", "Course")
-                        .WithMany()
+                        .WithMany("Enrollments")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("VgcCollege.Web.Models.Course", null)
-                        .WithMany("Enrollments")
-                        .HasForeignKey("CourseId1");
 
                     b.HasOne("VgcCollege.Web.Models.StudentProfile", "StudentProfile")
                         .WithMany()
@@ -628,14 +577,10 @@ namespace VgcCollege.Web.Migrations
             modelBuilder.Entity("VgcCollege.Web.Models.Exam", b =>
                 {
                     b.HasOne("VgcCollege.Web.Models.Course", "Course")
-                        .WithMany()
+                        .WithMany("Exams")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("VgcCollege.Web.Models.Course", null)
-                        .WithMany("Exams")
-                        .HasForeignKey("CourseId1");
 
                     b.Navigation("Course");
                 });
@@ -649,9 +594,9 @@ namespace VgcCollege.Web.Migrations
                         .IsRequired();
 
                     b.HasOne("VgcCollege.Web.Models.StudentProfile", "StudentProfile")
-                        .WithMany()
+                        .WithMany("ExamResults")
                         .HasForeignKey("StudentProfileId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Exam");
@@ -659,26 +604,11 @@ namespace VgcCollege.Web.Migrations
                     b.Navigation("StudentProfile");
                 });
 
-            modelBuilder.Entity("VgcCollege.Web.Models.FacultyProfile", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
-                        .WithMany()
-                        .HasForeignKey("IdentityUserId");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("VgcCollege.Web.Models.StudentProfile", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
-                        .WithMany()
-                        .HasForeignKey("IdentityUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "IdentityUser")
                         .WithMany()
-                        .HasForeignKey("IdentityUserId1");
+                        .HasForeignKey("IdentityUserId");
 
                     b.Navigation("IdentityUser");
                 });
@@ -695,6 +625,13 @@ namespace VgcCollege.Web.Migrations
                     b.Navigation("Enrollments");
 
                     b.Navigation("Exams");
+                });
+
+            modelBuilder.Entity("VgcCollege.Web.Models.StudentProfile", b =>
+                {
+                    b.Navigation("AssignmentResults");
+
+                    b.Navigation("ExamResults");
                 });
 #pragma warning restore 612, 618
         }
